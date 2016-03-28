@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+   	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<context:annotation-config />
+	<context:component-scan base-package="com.chales.dos" /> 
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:spring.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- c0p3连接池 -->
+	<bean id="dataSource_default" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.cust.driverClass}" />
+		<property name="jdbcUrl" value="${jdbc.cust.jdbcUrl}" />
+		<property name="user" value="${jdbc.cust.user}"></property>
+		<property name="password" value="${jdbc.cust.password}"></property>
+		<property name="minPoolSize" value="${jdbc.cust.minPoolSize}"></property>
+		<property name="maxPoolSize" value="${jdbc.cust.maxPoolSize}"></property>
+		<property name="maxIdleTime" value="${jdbc.cust.maxIdleTime}"></property>
+		<property name="acquireIncrement" value="3"></property>
+		<property name="maxStatements" value="5000"></property>
+		<property name="maxStatementsPerConnection" value="20"></property>
+		<property name="initialPoolSize" value="10"></property>
+		<property name="numHelperThreads" value="5"></property>
+		<property name="idleConnectionTestPeriod" value="60"></property>
+		<property name="acquireRetryAttempts" value="10"></property>
+		<property name="checkoutTimeout" value="30000"></property>
+		<property name="propertyCycle" value="300"></property>
+		<property name="breakAfterAcquireFailure" value="false"></property>
+		<property name="testConnectionOnCheckout" value="false"></property>
+	</bean>
+	
+    <!-- ========================================针对myBatis的配置项============================== -->
+    <!-- 配置sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 实例化sqlSessionFactory时需要使用上述配置好的数据源以及SQL映射文件 -->
+        <property name="dataSource" ref="dataSource_default" />
+        <property name="mapperLocations" value="classpath:sqlMapping/*.xml" />
+    </bean>
+    <!-- 配置扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.chales.dos.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+</beans>
